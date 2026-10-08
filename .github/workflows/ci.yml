@@ -1,0 +1,33 @@
+# office-crew-ci-gates: strict-v10
+# Auto-generated for C projects v3 (GitHub Actions).
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - shell: bash
+        run: |
+          if [ -f Makefile ] || [ -f makefile ]; then
+            make
+            if grep -Eqs '^([^:#=[:space:]]+[[:space:]]+)*test([[:space:]]+[^:#=[:space:]]+)*[[:space:]]*:([^=]|$)' Makefile makefile; then
+              make test
+            elif grep -Eqs '^([^:#=[:space:]]+[[:space:]]+)*check([[:space:]]+[^:#=[:space:]]+)*[[:space:]]*:([^=]|$)' Makefile makefile; then
+              make check
+            fi
+          elif [ -f CMakeLists.txt ]; then
+            cmake -S . -B build && cmake --build build
+            ctest --test-dir build --output-on-failure
+          else
+            shopt -s nullglob
+            srcs=(*.c)
+            if [ ${#srcs[@]} -gt 0 ]; then
+              gcc -std=c99 -Wall -Wextra "${srcs[@]}" -o app
+            else
+              echo "No Makefile/CMakeLists/.c sources — nothing to build"
+            fi
+          fi
