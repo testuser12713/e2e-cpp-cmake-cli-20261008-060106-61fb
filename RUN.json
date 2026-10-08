@@ -1,0 +1,19 @@
+{
+  "runcontract": 1,
+  "services": [
+    {
+      "name": "csvstats",
+      "dir": ".",
+      "stack": "c",
+      "kind": "cli",
+      "build": [
+        ["cmake", "-S", ".", "-B", "build"],
+        ["cmake", "--build", "build"]
+      ],
+      "test": [
+        ["ctest", "--test-dir", "build", "--output-on-failure"]
+      ],
+      "start": ["build/csvstats", "--help"]
+    }
+  ]
+}
